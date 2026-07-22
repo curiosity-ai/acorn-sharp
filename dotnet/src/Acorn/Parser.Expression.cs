@@ -501,7 +501,7 @@ public partial class Parser
     // which catches the engine's RangeError) we bound the recursion explicitly and
     // raise the same error acorn does.
     private int _exprRecursionDepth;
-    private const int MaxExprRecursionDepth = 1800;
+    private const int MaxExprRecursionDepth = 350;
 
     public Node ParseExprAtom(DestructuringErrors? refDestructuringErrors = null, object? forInit = null, bool forNew = false)
     {
