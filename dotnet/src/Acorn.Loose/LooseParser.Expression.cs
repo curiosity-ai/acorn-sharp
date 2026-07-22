@@ -288,7 +288,30 @@ public partial class LooseParser
         return baseExpr;
     }
 
+    // Bounds recursion on pathologically nested input. .NET's StackOverflowException
+    // is uncatchable, so (like acorn-loose's parse() which catches the engine's
+    // RangeError) we cap recursion depth and raise the same error instead.
+    private int _exprRecursionDepth;
+    private const int MaxExprRecursionDepth = 350;
+
     public Node ParseExprAtom()
+    {
+        if (++_exprRecursionDepth > MaxExprRecursionDepth)
+        {
+            _exprRecursionDepth--;
+            this.toks.Raise(this.tok.Start, "Not enough stack space to parse input");
+        }
+        try
+        {
+            return ParseExprAtomCore();
+        }
+        finally
+        {
+            _exprRecursionDepth--;
+        }
+    }
+
+    private Node ParseExprAtomCore()
     {
         Node node;
         if (this.tok.Type == tt.This || this.tok.Type == tt.Super)
