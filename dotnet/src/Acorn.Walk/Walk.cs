@@ -55,7 +55,7 @@ public sealed class Walker
     public void Recurse(Node node, object? state, string? @override = null) => _recurse(node, state, @override);
 }
 
-public static class Walk
+public static class AstWalker
 {
     // Carries a Found through the early-exit throw the JS code performs.
     private sealed class FoundException : Exception

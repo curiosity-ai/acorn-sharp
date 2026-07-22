@@ -131,7 +131,7 @@ public partial class LooseParser
 
     public bool CanInsertSemicolon() =>
         this.tok.Type == tt.Eof || this.tok.Type == tt.BraceR ||
-        Whitespace.LineBreak.IsMatch(this.input.Substring(this.last.End, this.tok.Start - this.last.End));
+        Whitespace.LineBreak.IsMatch(Slice(this.input, this.last.End, this.tok.Start));
 
     public bool Semicolon() => this.Eat(tt.Semi);
 

@@ -61,7 +61,10 @@ public partial class Parser
 
     public void CheckLocalExport(Node id)
     {
-        string name = (string)id["name"]!;
+        // String-literal export names have no `name`; JS would index the map with
+        // `undefined` and then immediately raise the literal-export error, so a
+        // missing name here is a no-op.
+        if (id["name"] is not string name) return;
         // scope.functions must be empty as Module code is always strict.
         if (ScopeStack[0].Lexical.IndexOf(name) == -1 &&
             ScopeStack[0].Var.IndexOf(name) == -1)

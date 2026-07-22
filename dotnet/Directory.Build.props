@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <!-- `tt`/`tc` are deliberate short aliases for TokenTypes/TokContexts to
+         keep the port readable against the JS source. -->
+    <NoWarn>$(NoWarn);CS8981</NoWarn>
+  </PropertyGroup>
+</Project>

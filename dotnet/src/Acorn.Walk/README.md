@@ -10,14 +10,14 @@ using Acorn.Walk;
 
 Node ast = Parser.ParseStatic("f(1); g(2);", new Options { EcmaVersion = 2020 });
 
-Walk.Simple(ast, new Dictionary<string, Action<Node, object?>>
+AstWalker.Simple(ast, new Dictionary<string, Action<Node, object?>>
 {
     ["CallExpression"] = (node, state) =>
         Console.WriteLine("call at " + node.Start)
 });
 ```
 
-Provides `Simple`, `Ancestor`, `Recursive`, `Full`, `FullAncestor`,
+Provides `AstWalker.Simple`, `Ancestor`, `Recursive`, `Full`, `FullAncestor`,
 `FindNodeAt`, `FindNodeAround`, `FindNodeAfter`, `FindNodeBefore`, `Make`, and
 the `BaseVisitor` table.
 

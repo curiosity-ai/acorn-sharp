@@ -41,6 +41,19 @@ public static class Fixtures
         throw new FileNotFoundException("Could not locate fixtures/all.json");
     }
 
+    /// <summary>Reads a JSON string, decoding the {$str16:[...]} lone-surrogate marker.</summary>
+    public static string? ReadJsString(JsonElement e)
+    {
+        if (e.ValueKind == JsonValueKind.String) return e.GetString();
+        if (e.ValueKind == JsonValueKind.Object && e.TryGetProperty("$str16", out var arr))
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (var x in arr.EnumerateArray()) sb.Append((char)x.GetInt32());
+            return sb.ToString();
+        }
+        return null;
+    }
+
     public static List<TestCase> Load()
     {
         string path = LocateFixtureFile();
@@ -52,13 +65,13 @@ public static class Fixtures
             var tc = new TestCase
             {
                 Group = el.GetProperty("group").GetString() ?? "",
-                Code = el.TryGetProperty("code", out var c) ? (c.GetString() ?? "") : "",
+                Code = el.TryGetProperty("code", out var c) ? (ReadJsString(c) ?? "") : "",
                 IsFail = el.TryGetProperty("isFail", out var f) && f.ValueKind == JsonValueKind.True,
             };
             if (el.TryGetProperty("ast", out var ast) && ast.ValueKind != JsonValueKind.Undefined)
                 tc.Ast = ast;
-            if (el.TryGetProperty("error", out var err) && err.ValueKind == JsonValueKind.String)
-                tc.Error = err.GetString();
+            if (el.TryGetProperty("error", out var err) && err.ValueKind != JsonValueKind.Null)
+                tc.Error = ReadJsString(err);
             if (el.TryGetProperty("options", out var opt) && opt.ValueKind == JsonValueKind.Object)
                 tc.Options = opt;
             list.Add(tc);

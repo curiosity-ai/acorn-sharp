@@ -37,6 +37,9 @@ public static class Whitespace
 
     public static int NextLineBreak(string code, int from, int end)
     {
+        // JS charCodeAt returns NaN past the end (never a line break); clamp so
+        // callers may pass an `end` beyond the string (e.g. recovered tokens).
+        if (end > code.Length) end = code.Length;
         for (int i = from; i < end; i++)
         {
             int next = code[i];

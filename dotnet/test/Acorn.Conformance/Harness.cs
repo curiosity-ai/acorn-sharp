@@ -41,33 +41,30 @@ public static class Harness
             {
                 ast = mode.Parse(test.Code, opts);
             }
-            catch (AcornSyntaxError e)
+            catch (Exception raw)
             {
+                Exception e = raw is System.Reflection.TargetInvocationException { InnerException: { } inner } ? inner : raw;
                 if (test.IsFail)
                 {
+                    // driver: match by message regardless of error type
                     if (ErrorMatches(test.Error!, e.Message)) { /* ok */ }
                     else Fail(res, test, $"Expected error message: {test.Error}\nGot error message: {e.Message}", maxFailuresToRecord);
                 }
-                else if (mode.Loose)
+                else if (e is AcornSyntaxError)
                 {
-                    // loose parser should not throw SyntaxError on valid code
-                    Crash(res, test, e.Message, maxFailuresToRecord);
+                    // non-fail test raised a genuine SyntaxError
+                    Fail(res, test, "Unexpected SyntaxError: " + e.Message, maxFailuresToRecord);
                 }
                 else
                 {
-                    Crash(res, test, e.Message, maxFailuresToRecord);
+                    Crash(res, test, e.GetType().Name + ": " + e.Message, maxFailuresToRecord);
                 }
-                continue;
-            }
-            catch (Exception e)
-            {
-                Crash(res, test, e.GetType().Name + ": " + e.Message, maxFailuresToRecord);
                 continue;
             }
 
             if (test.IsFail)
             {
-                if (mode.Loose) { /* loose auto-ok on error tests */ }
+                if (mode.Loose) { /* loose auto-ok when parse succeeds on an error test */ }
                 else Fail(res, test, $"Expected error message: {test.Error}\nBut parsing succeeded.", maxFailuresToRecord);
                 continue;
             }

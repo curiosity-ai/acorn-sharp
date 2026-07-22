@@ -862,16 +862,16 @@ public partial class Parser
         }
         if (keyName.Length == 0 && !isAsync && !isGenerator)
         {
-            string lastValue = (string)Value!;
+            object? lastValue = Value;
             if (EatContextual("get") || EatContextual("set"))
             {
                 if (IsClassElementNameStart())
                 {
-                    kind = lastValue;
+                    kind = (string)lastValue!;
                 }
                 else
                 {
-                    keyName = lastValue;
+                    keyName = (string)lastValue!;
                 }
             }
         }
@@ -1209,7 +1209,7 @@ public partial class Parser
 
     public Node ParseExportDefaultDeclaration()
     {
-        bool isAsync;
+        bool isAsync = false;
         if (Type == tt.Function || (isAsync = IsAsyncFunction()))
         {
             Node fNode = StartNode();
@@ -1478,7 +1478,9 @@ public partial class Parser
         for (int i = 0; i < statements.Count && IsDirectiveCandidate((Node)statements[i]!); ++i)
         {
             string raw = (string)((Node)((Node)statements[i]!)["expression"]!)["raw"]!;
-            ((Node)statements[i]!)["directive"] = raw.Substring(1, raw.Length - 2);
+            // JS: raw.slice(1, -1) — strips the surrounding quotes; clamp for
+            // short/recovered raws (loose parser) where length < 2.
+            ((Node)statements[i]!)["directive"] = raw.Length >= 2 ? raw.Substring(1, raw.Length - 2) : "";
         }
     }
 

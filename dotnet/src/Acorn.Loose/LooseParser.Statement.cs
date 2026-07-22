@@ -481,8 +481,8 @@ public partial class LooseParser
             // Method
             Node key = (Node)node["key"]!;
             bool isConstructor =
-                !(bool)node["computed"]! &&
-                !(bool)node["static"]! &&
+                !(node["computed"] as bool? ?? false) &&
+                !(node["static"] as bool? ?? false) &&
                 !isGenerator &&
                 !isAsync &&
                 kind == "method" && (

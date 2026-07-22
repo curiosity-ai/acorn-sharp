@@ -74,18 +74,37 @@ for (const f of files) {
 }
 
 // --- Serialization replacer ---
-function encode(value) {
-  if (typeof value === "bigint") return {$bigint: value.toString()}
-  if (value instanceof RegExp) return {$regexp: value.toString()}
-  return value
+// Detect strings containing lone UTF-16 surrogates (which System.Text.Json
+// refuses to decode). Such strings are encoded as {$str16:[charCodes]} so the
+// C# side can rebuild them from code units.
+function hasLoneSurrogate(s) {
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i)
+    if (c >= 0xD800 && c <= 0xDBFF) {
+      const n = s.charCodeAt(i + 1)
+      if (!(n >= 0xDC00 && n <= 0xDFFF)) return true
+      i++
+    } else if (c >= 0xDC00 && c <= 0xDFFF) {
+      return true
+    }
+  }
+  return false
 }
-// JSON.stringify calls replacer with (key, value) but BigInt throws before
-// the replacer sees it in some node versions when nested; handle via recursion.
+function encStr(s) {
+  if (typeof s !== "string") return s
+  if (!hasLoneSurrogate(s)) return s
+  const codes = new Array(s.length)
+  for (let i = 0; i < s.length; i++) codes[i] = s.charCodeAt(i)
+  return {$str16: codes}
+}
 function deepEncode(v, seen) {
   if (v === null || v === undefined) return v
   if (typeof v === "bigint") return {$bigint: v.toString()}
   if (v instanceof RegExp) return {$regexp: v.toString()}
   if (typeof v === "function") return undefined
+  if (typeof v === "string") return encStr(v)
+  if (typeof v === "number" && !isFinite(v))
+    return {$number: v === Infinity ? "Infinity" : (v === -Infinity ? "-Infinity" : "NaN")}
   if (Array.isArray(v)) return v.map(x => deepEncode(x, seen))
   if (typeof v === "object") {
     const out = {}
@@ -100,9 +119,9 @@ function deepEncode(v, seen) {
 
 const encoded = cases.map(c => ({
   group: c.group,
-  code: c.code,
+  code: encStr(c.code),
   ast: c.ast !== undefined ? deepEncode(c.ast, null) : undefined,
-  error: c.error,
+  error: encStr(c.error),
   options: c.options ? deepEncode(c.options, null) : null,
   isFail: c.error !== undefined
 }))

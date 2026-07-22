@@ -70,7 +70,7 @@ Node ast = AcornLoose.Parse("foo(", new Options { EcmaVersion = 2020 });
 ```csharp
 using Acorn.Walk;
 
-Walk.Simple(ast, new Dictionary<string, Action<Node, object?>>
+AstWalker.Simple(ast, new Dictionary<string, Action<Node, object?>>
 {
     ["CallExpression"] = (node, state) => Console.WriteLine("call at " + node.Start)
 });

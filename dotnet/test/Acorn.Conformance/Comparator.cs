@@ -32,6 +32,28 @@ public static class Comparator
                 string got = act is BigInteger b ? b.ToString() : PpJson(act);
                 return want == got ? null : $"{want} !== {got}";
             }
+            if (exp.TryGetProperty("$number", out var num) && exp.EnumerateObject().Count() == 1)
+            {
+                double want = num.GetString() switch
+                {
+                    "Infinity" => double.PositiveInfinity,
+                    "-Infinity" => double.NegativeInfinity,
+                    _ => double.NaN
+                };
+                if (act is double ad)
+                {
+                    bool ok = double.IsNaN(want) ? double.IsNaN(ad) : ad == want;
+                    return ok ? null : $"{num.GetString()} !== {ad}";
+                }
+                return $"{num.GetString()} !== {PpJson(act)}";
+            }
+            if (exp.TryGetProperty("$str16", out var s16) && exp.EnumerateObject().Count() == 1)
+            {
+                var sb = new System.Text.StringBuilder();
+                foreach (var x in s16.EnumerateArray()) sb.Append((char)x.GetInt32());
+                string want = sb.ToString();
+                return (act as string) == want ? null : $"{PpJson((object?)want)} !== {PpJson(act)}";
+            }
         }
 
         switch (exp.ValueKind)
