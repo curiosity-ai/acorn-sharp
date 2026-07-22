@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>AnyCPU</Platforms>
+    <Company>Curiosity GmbH</Company>
+    <PackageId>Acorn</PackageId>
+    <RootNamespace>Acorn</RootNamespace>
+    <Authors>Curiosity GmbH and the original Acorn authors</Authors>
+    <Product>Acorn</Product>
+    <Description>A C# port of Acorn, a small, fast, standards-compliant JavaScript parser producing ESTree-compatible syntax trees. Ported from the JavaScript implementation at https://github.com/acornjs/acorn.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>(c) Copyright 2024 Curiosity GmbH, Copyright (c) by the Acorn authors</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/curiosity-ai/acorn-sharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/curiosity-ai/acorn-sharp</RepositoryUrl>
+    <PackageTags>javascript;parser;ecmascript;estree;ast;acorn</PackageTags>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" Condition="Exists('README.md')" />
+  </ItemGroup>
+
+</Project>
