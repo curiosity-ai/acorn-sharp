@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Acorn.Loose/Acorn.Loose.csproj" />
+    <Project Path="src/Acorn.Walk/Acorn.Walk.csproj" />
+    <Project Path="src/Acorn/Acorn.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Acorn.Conformance/Acorn.Conformance.csproj" />
+    <Project Path="test/Acorn.Tests/Acorn.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -36,6 +36,20 @@ cd acorn
 npm install
 ```
 
+## C# / .NET port
+
+This fork additionally contains a faithful **C# port of Acorn targeting .NET 10**,
+located entirely under [`dotnet/`](dotnet/). The JavaScript sources above are kept
+intact so the fork can track upstream; all C# code, tests and build tooling live
+in `dotnet/`. The port produces the same ESTree-compatible syntax trees and is
+validated against 3530 conformance cases generated from this repository's own
+JavaScript test suite.
+
+It ships as three NuGet packages — `Acorn`, `Acorn.Loose`, `Acorn.Walk` — built by
+the Azure DevOps pipeline in [`dotnet/.devops/build-nuget.yml`](dotnet/.devops/build-nuget.yml).
+See [`dotnet/README.md`](dotnet/README.md) for usage and [`CLAUDE.md`](CLAUDE.md)
+for how the port maps to the JavaScript source.
+
 ## Plugin developments
 
 Acorn is designed to support plugins which can, within reasonable

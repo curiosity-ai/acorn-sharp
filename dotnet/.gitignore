@@ -1,0 +1,9 @@
+## .NET build output
+bin/
+obj/
+*.user
+.vs/
+artifacts/
+*.nupkg
+TestResults/
+conformance-failures.txt

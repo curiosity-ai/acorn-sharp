@@ -1,0 +1,74 @@
+variables:
+  solution: './dotnet/Acorn.slnx'
+  acornProject: './dotnet/src/Acorn/Acorn.csproj'
+  looseProject: './dotnet/src/Acorn.Loose/Acorn.Loose.csproj'
+  walkProject: './dotnet/src/Acorn.Walk/Acorn.Walk.csproj'
+  buildConfiguration: 'Release'
+  targetVersion: yy.M.$(build.buildId)
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: NuGetToolInstaller@0
+
+- task: PowerShell@2
+  displayName: 'Create CalVer Version'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $dottedDate = (Get-Date).ToString("yy.M")
+      $buildID = $($env:BUILD_BUILDID)
+      $modBuildID = [int]$buildID % 65536  # ensure fits in int16
+      $newTargetVersion = "$dottedDate.$modBuildID"
+      Write-Host "##vso[task.setvariable variable=targetVersion;]$newTargetVersion"
+      Write-Host "Updated targetVersion to '$newTargetVersion'"
+
+- task: UseDotNet@2
+  displayName: 'Use .NET 10.0 SDK'
+  inputs:
+    packageType: sdk
+    version: 10.x
+    includePreviewVersions: false
+    installationPath: $(Agent.ToolsDirectory)\dotnet
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(solution)'
+  displayName: 'restore nuget'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(solution)'
+    arguments: '-c $(buildConfiguration) /p:Version=$(targetVersion) /p:LangVersion=latest'
+  displayName: 'build solution'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: './dotnet/test/Acorn.Tests/Acorn.Tests.csproj'
+    arguments: '-c $(buildConfiguration) --no-build'
+  displayName: 'run conformance tests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '$(acornProject);$(looseProject);$(walkProject)'
+    versioningScheme: 'off'
+    configuration: '$(buildConfiguration)'
+    buildProperties: 'Version="$(targetVersion)";LangVersion="latest"'
+    nobuild: true
+  displayName: 'pack nuget packages'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '**/*.nupkg'
+    nuGetFeedType: 'external'
+    publishFeedCredentials: 'nuget-curiosity-org'
+  displayName: 'push nuget'

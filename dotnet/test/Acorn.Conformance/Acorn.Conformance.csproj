@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>Acorn.Conformance</AssemblyName>
+    <RootNamespace>Acorn.Conformance</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Acorn\Acorn.csproj" />
+    <ProjectReference Include="..\..\src\Acorn.Loose\Acorn.Loose.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\fixtures\all.json" Link="fixtures\all.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
